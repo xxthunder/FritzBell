@@ -5,7 +5,7 @@ import time
 from fritzconnection import FritzConnection
 import logging
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.WARN)
 
 
 class Caller:
@@ -21,7 +21,6 @@ class Caller:
         self.logger.info('Calling ' + number)
 
         my_fritz_connection = FritzConnection(self.hostname, self.port, self.user, self.passwd)
-        self.logger.info(my_fritz_connection.modelname)
 
         # Todo: what about service discovery first?
         my_fritz_connection.call_action('X_VoIP1', 'X_AVM-DE_DialNumber', arguments={'NewX_AVM-DE_PhoneNumber': number})
@@ -55,7 +54,7 @@ def main():
     if args.port:
         port = args.port
     my_caller = Caller(hostname, port, args.user, args.passwd)
-    my_caller.run(args.number)
+    my_caller.run(args.number, 20)
 
 
 if __name__ == '__main__':
