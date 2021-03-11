@@ -17,7 +17,7 @@ class Caller:
         self.user = user
         self.passwd = passwd
 
-    def run(self, number, timeout=0):
+    def call(self, number, duration=0):
         self.logger.info('Calling ' + number)
 
         my_fritz_connection = FritzConnection(self.hostname, self.port, self.user, self.passwd)
@@ -26,8 +26,8 @@ class Caller:
         my_fritz_connection.call_action('X_VoIP1', 'X_AVM-DE_DialNumber', arguments={'NewX_AVM-DE_PhoneNumber': number})
 
         # Todo: maybe this should be a separate function?
-        if timeout > 0:
-            time.sleep(timeout)
+        if duration > 0:
+            time.sleep(duration)
             my_fritz_connection.call_action('X_VoIP1', 'X_AVM-DE_DialHangup')
 
         return True
@@ -44,6 +44,11 @@ def main():
         required=True,
         help='Number to be called, e.g., \'**9\' for broadcast call (every connected phone).'
     )
+    argument_parser.add_argument(
+        '--duration',
+        required=False,
+        help='Duration of the call (default: 0, i.e., just call and don\'t hangup).'
+    )
     args = argument_parser.parse_args()
 
     # Handle optional arguments
@@ -53,8 +58,13 @@ def main():
     port = 49000
     if args.port:
         port = args.port
+    duration = 0
+    if args.duration:
+        duration = args.duration
+
+    # Do the call
     my_caller = Caller(hostname, port, args.user, args.passwd)
-    my_caller.run(args.number, 20)
+    my_caller.call(args.number, duration)
 
 
 if __name__ == '__main__':
